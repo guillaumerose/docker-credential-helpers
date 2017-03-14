@@ -1,28 +1,20 @@
 version: "{build}"
 
-# Source Config
 clone_folder: c:\gopath\src\github.com\docker\docker-credential-helpers
-
-# Build host
 
 environment:
     global:
       GOPATH: c:\gopath
       CGO_ENABLED: 1
-      GOVERSION: 1.7
-    matrix:
-      - platform: x64
-        GOARCH: amd64
-        MSYS2_BITS: 64
+      MSYS2_BITS: 64
 
 init:
   - git config --global core.autocrlf input
 
-# Build
 install:
   - rmdir c:\go /s /q
-  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-%GOARCH%.msi
-  - msiexec /i go%GOVERSION%.windows-%GOARCH%.msi /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go1.7.windows-amd64.msi
+  - msiexec /i go1.7.windows-amd64.msi /q
   - set Path=c:\msys64\mingw%MSYS2_BITS%\bin;c:\go\bin;%Path%
   - go version
   - go env
@@ -37,21 +29,9 @@ after_test:
   - mkdir bin
   - go build -o bin/docker-credential-wincred.exe wincred/cmd/main_windows.go
 
-# IMPORTANT All the artifacts need to be listed here, or they won't be uploaded to GitHub
 artifacts:
   - path: bin/docker-credential-wincred.exe
     name: docker-credential-wincred.exe
-
-# deploy:
-#   # All the zipped artifacts will be deployed
-#   description: "Visit the [Changelog](https://github.com/docker/docker-credential-helpers/blob/master/CHANGELOG.md) for a detailed description of what's new in this release."
-#   artifact: /.*\.zip/
-#   auth_token:
-#     secure: ixWmTXZs8aV5+9s6vPXziIcdMMLd+lBVINJ0K/Sy++2wllpRxUec4/TPVKUGLqvL
-#   provider: GitHub
-#   # deploy when a new tag is pushed
-#   on:
-#     appveyor_repo_tag: true
 
 branches:
   only:
